@@ -6,7 +6,6 @@ import 'dart:math';
 class Node {
   String data;
   Node? next;
-
   Node(this.data);
 }
 
@@ -51,7 +50,6 @@ String randomBackgroundColor() {
     '\x1B[46m', // Cyan
     '\x1B[47m'  // Putih
   ];
-
   final rand = Random();
   return colors[rand.nextInt(colors.length)];
 }
@@ -59,7 +57,6 @@ String randomBackgroundColor() {
 void main() {
   LinkedList list = LinkedList();
   String name = 'Franklin Jaya';
-
   for (int i = 0; i < name.length; i++) {
     list.append(name[i]);
   }
@@ -68,6 +65,7 @@ void main() {
   int position = 0;
   int row = 0;
   String displayLine = '';
+  String currentColor = randomBackgroundColor();
 
   // Fungsi untuk membersihkan terminal
   void clearScreen() {
@@ -81,28 +79,37 @@ void main() {
   // Fungsi untuk menampilkan nama dengan jejak
   void displayName() {
     clearScreen();
-    String lineBackground;
-
-    if (row % 2 == 1) {
-      lineBackground = randomBackgroundColor();
-      displayLine += name; // Tambahkan nama ke jejak
-      stdout.writeln('${lineBackground}${' ' * (width - displayLine.length)}$displayLine\x1B[0m');
+    
+    if (row % 2 == 0) {
+      // Baris genap: dari kiri ke kanan
+      displayLine += name;
+      stdout.writeln('$currentColor${displayLine.padRight(width)}\x1B[0m');
     } else {
-      lineBackground = randomBackgroundColor();
-      stdout.writeln('${lineBackground}${displayLine}\x1B[0m'); // Tampilkan jejak dengan latar belakang ganjil
-      displayLine += name; // Tambahkan nama ke jejak
+      // Baris ganjil: dari kanan ke kiri
+      displayLine = name + displayLine;
+      stdout.writeln('$currentColor${displayLine.padLeft(width)}\x1B[0m');
     }
 
-    position++;
+    position += name.length;
+
+    // Periksa apakah posisi telah melebihi lebar terminal
     if (position > width) {
-      row++; // Beralih ke baris berikutnya
-      displayLine = ''; // Reset jejak untuk baris berikutnya
-      position = 0; // Reset posisi untuk baris baru
+      row++;
+      displayLine = '';
+      position = 0;
+      currentColor = randomBackgroundColor(); // Ganti warna untuk baris baru
     }
 
+    // Atur batasan untuk row
     if (row >= 2) {
-      row = 0; // Kembali ke baris pertama
+      row = 0;
+      displayLine = '';
+      position = 0;
+      currentColor = randomBackgroundColor(); // Ganti warna setiap 2 baris
     }
+
+    // Cetak nilai row untuk debug
+    print('Row: $row');
   }
 
   // Timer untuk menjalankan animasi secara berulang
